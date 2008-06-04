@@ -3,7 +3,7 @@
 
 class StaticHtmlCachingExtension < Radiant::Extension
   version "1.0"
-  description "Describe your extension here"
+  description "Static HTML caching (serve cached files through the webserver e.g. apache)"
   url "http://yourwebsite.com/static_html_caching"
   
   # define_routes do |map|
@@ -12,6 +12,8 @@ class StaticHtmlCachingExtension < Radiant::Extension
   
   def activate
     # admin.tabs.add "Static Html Caching", "/admin/static_html_caching", :after => "Layouts", :visibility => [:all]
+    puts("Static HTML Caching activated")
+    ResponseCache.instance_eval { include StaticResponseCache }
   end
   
   def deactivate
