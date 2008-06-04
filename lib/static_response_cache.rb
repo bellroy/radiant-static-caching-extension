@@ -2,9 +2,7 @@ module StaticResponseCache
   
   def self.included(base)
     base.instance_eval do
-      [:cache_page,:expire_page].each do |m| 
-        alias_method_chain m, :static
-      end
+      alias_method_chain :cache_page, :static
     end
   end
 
@@ -22,18 +20,6 @@ module StaticResponseCache
     # ensure path exists
     FileUtils.makedirs(File.dirname(cache_path))
     File.open(cache_path, 'wb') { |f| f.write(content) }
-  end
-
-  def expire_page_with_static(path)
-    return unless perform_caching
-    
-    cache_path = static_cache_path(path)
-    logger.info("Expiring Page: #{static_cache_path path}")
-    # expire_page doesn't get called with model so can't know what its extension is,
-    # so just wipe all out since its unlikely that there'll be more than one
-    File.delete(cache_path) if File.exists?(cache_path)
-    Dir[cache_path + '.*'].each { |f| File.delete(f) }
-    
   end
 
   def static_cache_path(path)
