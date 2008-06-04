@@ -2,23 +2,38 @@ module StaticResponseCache
   
   def self.included(base)
     base.instance_eval do
-      alias_method_chain :cache_page, :static
+      [:cache_page,:expire_page].each do |m| 
+        alias_method_chain m, :static
+      end
     end
   end
 
   def cache_page_with_static(metadata, content, path)
+    return unless perform_caching
+    
     cache_path = static_cache_path(path)
+    logger.info("Caching Page: #{cache_path}")
     metadata = YAML.load(metadata)
     if File.extname(cache_path).blank? &&
       (metadata['Content-Type'].nil? ||
         metadata['Content-Type'].starts_with?('text/html'))
       cache_path = cache_path + '.html'
     end
-    logger.info("Caching Page: #{cache_path}")
-    logger.info("metadata: #{metadata.inspect}")
     # ensure path exists
     FileUtils.makedirs(File.dirname(cache_path))
     File.open(cache_path, 'wb') { |f| f.write(content) }
+  end
+
+  def expire_page_with_static(path)
+    return unless perform_caching
+    
+    cache_path = static_cache_path(path)
+    logger.info("Expiring Page: #{static_cache_path path}")
+    # expire_page doesn't get called with model so can't know what its extension is,
+    # so just wipe all out since its unlikely that there'll be more than one
+    File.delete(cache_path) if File.exists?(cache_path)
+    Dir[cache_path + '.*'].each { |f| File.delete(f) }
+    
   end
 
   def static_cache_path(path)
