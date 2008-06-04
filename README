@@ -1,0 +1,5 @@
+= Static Html Caching
+
+A Radiant Extension to do static html file caching
+
+Then Apache (et. al.) can be used to serve the pages without hitting the ruby app
