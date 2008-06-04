@@ -2,9 +2,7 @@ module StaticResponseCache
   
   def self.included(base)
     base.instance_eval do
-      [:cache_page,:expire_page].each do |m| 
-        alias_method_chain m, :static
-      end
+      alias_method_chain :cache_page, :static
     end
   end
 
@@ -18,13 +16,11 @@ module StaticResponseCache
     end
     logger.info("Caching Page: #{cache_path}")
     logger.info("metadata: #{metadata.inspect}")
-    # ensure path exists (mkdir_p)
+    # ensure path exists
+    FileUtils.makedirs(File.dirname(cache_path))
+    File.open(cache_path, 'wb') { |f| f.write(content) }
   end
 
-  def expire_page_with_static(path)
-    logger.info("Expiring Page: #{static_cache_path path}")
-  end
-  
   def static_cache_path(path)
     cache_path = page_cache_path(path)
     if cache_path.ends_with?('_site-root')
