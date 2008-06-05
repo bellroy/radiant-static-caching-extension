@@ -4,7 +4,7 @@
 class StaticHtmlCachingExtension < Radiant::Extension
   version "1.0"
   description "Static HTML caching (serve cached files through the webserver e.g. apache)"
-  url "http://yourwebsite.com/static_html_caching"
+  url "http://github.com/tricycle/radiant-static-html-caching"
   
   # define_routes do |map|
   #   map.connect 'admin/static_html_caching/:action', :controller => 'admin/static_html_caching'
