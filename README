@@ -1,9 +1,9 @@
-= Static Html Caching
+= Static Caching
 
-A Radiant Extension to do static html file caching
+A Radiant Extension to do static file caching
 
 Then Apache (et. al.) can be used to serve the pages without hitting the ruby app
 
 
 = Note
-extension needs to be checked out as 'static_html_caching' so that radiant's extension loading picks it up
+extension needs to be checked out as 'static_caching' so that radiant's extension loading picks it up
