@@ -1,0 +1,45 @@
+= Static Caching
+
+A Radiant Extension to do static file caching.
+
+Then Apache (et. al.) can be used to serve the pages without hitting the ruby app
+
+= Note
+extension needs to be checked out as 'static_caching' so that radiant's extension loading picks it up
+
+= Apache Setup
+== Rewrite Rules
+You need some apache config along the lines of this:
+
+  # Rewrite / to cache/index.html if it exists
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache/index.html -f
+  RewriteRule ^(/)?$ /radiant-cache/index.html [P,QSA,L]
+  
+  # Rewrite /path/to/page to cache/path/to/page if it exists (for paths already containing an extension)
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI} -f
+  RewriteRule . /radiant-cache%{REQUEST_URI} [P,QSA,L]
+  
+  # Rewrite /path/to/page to cache/path/to/page.html if it exists
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI}.html -f
+  RewriteRule . /radiant-cache%{REQUEST_URI}.html [P,QSA,L]
+  
+  # Rewrite /path/to/page/ (trailing slash) to cache/path/to/page.html if it exists
+  RewriteCond %{REQUEST_URI} ^(.+)/$
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache$1.html -f
+  RewriteRule ^(.+)/$ /radiant-cache$1.html [P,QSA,L]
+  
+== If using Passenger
+If you're using passenger and don't want it to spawn a Rails process just to serve cached content you need to add 
+<code>RailsAutoDetect off</code> to the vhost defining your app and setup another vhost to be the passenger application server.
+You can do this by binding the passenger vhost to a loopback address and proxying the requests
+
+  # In the externally accessable vhost
+  RailsAutoDetect off
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
+  RewriteRule . http://127.0.10.10%{REQUEST_URI} [P,QSA]
+  
+And in the other vhost
+  <VirtualHost 127.0.10.10:80>
+    DocumentRoot /path/to/app
+    # usual setup
+  </VirtualHost>
