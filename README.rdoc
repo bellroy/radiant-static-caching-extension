@@ -7,6 +7,12 @@ Then Apache (et. al.) can be used to serve the pages without hitting the ruby ap
 = Note
 extension needs to be checked out as 'static_caching' so that radiant's extension loading picks it up
 
+= Radiant Setup
+== Caching directory location
+The cache directory needs to be in a web accessible location, so config/environment.rb needs something like this:
+
+  config.action_controller.page_cache_directory = "#{RAILS_ROOT}/public/radiant-cache"
+
 = Apache Setup
 == Rewrite Rules
 You need some apache config along the lines of this:
