@@ -9,13 +9,13 @@ extension needs to be checked out as 'static_caching' so that radiant's extensio
 
 = Radiant Setup
 == Caching directory location
-The cache directory needs to be in a web accessible location, so config/environment.rb needs something like this:
+The cache directory needs to be in a web accessible location, so config/environment.rb or config/initializers/static_caching.rb needs something like this:
 
   config.action_controller.page_cache_directory = "#{RAILS_ROOT}/public/radiant-cache"
 
 = Apache Setup
 == Rewrite Rules
-You need some apache config along the lines of this:
+You need some apache config along the lines of this (note that <code>/radiant-cache</code> here matches <code>/public/radiant-cache</code> in "Radiant Setup" above - if these don't agree Radiant will write a cache, but Apache will not use it):
 
   # Rewrite / to cache/index.html if it exists
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache/index.html -f
