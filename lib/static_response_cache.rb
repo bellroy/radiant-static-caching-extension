@@ -15,7 +15,7 @@ module StaticResponseCache
     if File.extname(cache_path).blank? &&
       (metadata['Content-Type'].nil? ||
         metadata['Content-Type'].starts_with?('text/html'))
-      cache_path = cache_path + '.html'
+      cache_path = cache_path + '.cache.html'
     end
     # ensure path exists
     FileUtils.makedirs(File.dirname(cache_path))

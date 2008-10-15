@@ -32,8 +32,8 @@ describe 'StaticResponseCache' do
       YAML.stub!(:load).and_return({})
     end
 
-    it 'should add .html to the cached path if no extension' do
-      File.should_receive(:open).with('path/to/doc.html', 'wb')
+    it 'should add .cache.html to the cached path if no extension' do
+      File.should_receive(:open).with('path/to/doc.cache.html', 'wb')
       @cache.cache_page_with_static('yaml', 'document', 'path')
     end
 

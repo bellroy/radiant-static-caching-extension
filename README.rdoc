@@ -9,7 +9,7 @@ extension needs to be checked out as 'static_caching' so that radiant's extensio
 
 = Radiant Setup
 == Caching directory location
-The cache directory needs to be in a web accessible location, so config/environment.rb or config/initializers/static_caching.rb needs something like this:
+The cache directory needs to be in a web accessible location, so config/environment.rb needs something like this:
 
   config.action_controller.page_cache_directory = "#{RAILS_ROOT}/public/radiant-cache"
 
@@ -19,20 +19,20 @@ You need some apache config along the lines of this (note that <code>/radiant-ca
 
   # Rewrite / to cache/index.html if it exists
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache/index.html -f
-  RewriteRule ^(/)?$ /radiant-cache/index.html [P,QSA,L]
+  RewriteRule ^(/)?$ /radiant-cache/index.cache.html [P,QSA,L]
   
   # Rewrite /path/to/page to cache/path/to/page if it exists (for paths already containing an extension)
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI} -f
   RewriteRule . /radiant-cache%{REQUEST_URI} [P,QSA,L]
   
-  # Rewrite /path/to/page to cache/path/to/page.html if it exists
-  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI}.html -f
-  RewriteRule . /radiant-cache%{REQUEST_URI}.html [P,QSA,L]
+  # Rewrite /path/to/page to cache/path/to/page.cache.html if it exists
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI}.cache.html -f
+  RewriteRule . /radiant-cache%{REQUEST_URI}.cache.html [P,QSA,L]
   
-  # Rewrite /path/to/page/ (trailing slash) to cache/path/to/page.html if it exists
+  # Rewrite /path/to/page/ (trailing slash) to cache/path/to/page.cache.html if it exists
   RewriteCond %{REQUEST_URI} ^(.+)/$
-  RewriteCond %{DOCUMENT_ROOT}/radiant-cache$1.html -f
-  RewriteRule ^(.+)/$ /radiant-cache$1.html [P,QSA,L]
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache$1.cache.html -f
+  RewriteRule ^(.+)/$ /radiant-cache$1.cache.html [P,QSA,L]
   
 == If using Passenger
 If you're using passenger and don't want it to spawn a Rails process just to serve cached content you need to add 
