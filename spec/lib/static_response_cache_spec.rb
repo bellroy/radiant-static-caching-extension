@@ -31,15 +31,15 @@ describe 'StaticResponseCache' do
       YAML.stub!(:load).and_return({})
     end
 
-    it 'should add .html to the cached path if no extension' do
+    it 'should add .cached.html to the cached path if no extension' do
       @cache.stub!(:static_cache_path).and_return('path/to/doc')
-      File.should_receive(:open).with('path/to/doc.html', 'wb')
+      File.should_receive(:open).with('path/to/doc.cache.html', 'wb')
       @cache.cache_page_with_static('yaml', 'document', 'path')
     end
 
-    it 'should add .html to the cached path if extension is .seo' do
+    it 'should add .cached.html to the cached path if extension is .seo' do
       @cache.stub!(:static_cache_path).and_return('path/to/doc.seo')
-      File.should_receive(:open).with('path/to/doc.seo.html', 'wb')
+      File.should_receive(:open).with('path/to/doc.seo.cache.html', 'wb')
       @cache.cache_page_with_static('yaml', 'document', 'path')
     end
 
