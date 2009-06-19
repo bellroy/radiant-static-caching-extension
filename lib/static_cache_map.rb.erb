@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'uri'
+require 'digest/sha1'
+require 'yaml'
+
+gem 'radiant', '~> 0.8'
+$LOAD_PATH << "<%= radiant_root %>/vendor/rack-cache/lib"
+
+require 'rack/cache/key'
+
+# Reads a full URL on stdin, returns a rewrite result
+META_BASE_PATH= '<%= meta_base_path %>' #'/Users/wmoore/Work/radiant-0-8/cache/meta/'
+ENTITY_BASE_PATH= '<%= entity_base_path %>' #'/Users/wmoore/Work/radiant-0-8/cache/entity/'
+
+# Use unbuffered IO
+STDIN.sync = STDOUT.sync = true
+
+class URI::HTTP
+  alias_method :path_info, :path
+
+  def script_name
+    "" # XXX is this always empty?
+  end
+
+  def query_string
+    query or ''
+  end
+
+end
+
+def spread(sha, n=2)
+  sha[n,0] = '/'
+  sha
+end
+
+while line = STDIN.gets
+  begin
+    parts = YAML.load(line)
+    parts[:scheme] = parts.delete(:https) == 'on' ? 'https' : 'http'
+    
+    request = URI::HTTP.build(parts)
+
+    key = Rack::Cache::Key.new(request).generate
+    key_path = File.join(META_BASE_PATH, spread(Digest::SHA1.hexdigest(key)))
+
+    if File.exists?(key_path)
+      meta = Marshal.load(File.open(key_path))
+
+      req, res = meta.first
+      body_file = URI::escape(ENTITY_BASE_PATH + spread(res['X-Content-Digest']))
+      puts "#{body_file} #{res['Content-Type']}"
+    else
+      puts
+    end
+  rescue => e
+    puts
+    STDERR.puts e.message
+  end
+end

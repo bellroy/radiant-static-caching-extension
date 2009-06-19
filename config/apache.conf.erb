@@ -1,0 +1,17 @@
+RewriteEngine on
+
+RewriteMap static_cache prg:/Users/wmoore/Work/radiant-sites/static_cache_map.rb
+RewriteMap unescape int:unescape
+
+RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+RewriteCond ${static_cache:\{:https:\ %{HTTPS},\ :host:\ %{HTTP_HOST},\ :port:\ %{SERVER_PORT},\ :path:\ %{REQUEST_URI},\ :query:\ %{QUERY_STRING}\}} ^(.*)$
+RewriteCond %1 !=""
+RewriteCond %1 ^([^\ ]+)\ (.*)$
+RewriteCond ${unescape:%1} -f
+RewriteRule .* ${unescape:%1} [T=%2,L]
+
+<Directory "/Users/wmoore/Work/radiant-0-8/cache/entity">
+  Options FollowSymLinks
+  Order allow,deny
+  Allow from all
+</Directory>
