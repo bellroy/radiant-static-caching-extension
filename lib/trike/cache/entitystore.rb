@@ -36,6 +36,8 @@ module Trike
 
       ext  = File.extname(uri.path)
       path = uri.path
+      path += "index" if (path  =~  /\/$/ || path.empty?)
+      
       path += '?' + uri.query unless uri.query.blank?
       if ext.blank?
         path += ".html" if (content_type.nil? || content_type.starts_with?("text/html"))

@@ -49,6 +49,10 @@ describe Trike::EntityStore do
     before do
       @store = Trike::EntityStore.new("/root/path")
     end
+    
+    it "adds index.html when accessing the root of the site" do
+      @store.generate_key("text/html", "http://www.example.com/").should == "/index.html"
+    end
 
     it "includes the query string" do
       @store.generate_key("text/html", "http://www.example.com/path/to/file?query=string").should == "/path/to/file?query=string.html"
@@ -75,7 +79,9 @@ describe Trike::EntityStore do
       @store.generate_key("text/html", "http://www.example.com/path/to/index.html?stuff").should == "/path/to/index.html?stuff.html"
     end
 
-    it "handles index.html"
+    it "handles writes the empty path to index" do
+      @store.generate_key("text/html", "http://www.example.com/path/to/").should == "/path/to/index.html"      
+    end
 
   end
 
