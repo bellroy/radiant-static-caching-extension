@@ -1,10 +1,10 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 require 'trike/cache/metastore'
 
-describe Trike::MetaStore do
+describe Trike::Cache::MetaStore do
   
   before do
-    @store = Trike::MetaStore.new
+    @store = Trike::Cache::MetaStore.new
   end
   
   describe "#store" do

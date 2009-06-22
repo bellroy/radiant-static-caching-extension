@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 require 'trike/cache/entitystore'
 
-describe Trike::EntityStore do
+describe Trike::Cache::EntityStore do
 
   before do
     {File => [:exists?, :unlink, :open], FileUtils => [:mv, :mkdir_p]}.each do |klass, methods|
@@ -9,7 +9,7 @@ describe Trike::EntityStore do
     end
 
     @root_path = "/root/path"
-    @store = Trike::EntityStore.new(@root_path)
+    @store = Trike::Cache::EntityStore.new(@root_path)
   end
 
   describe "storing a page" do
@@ -47,7 +47,7 @@ describe Trike::EntityStore do
   describe "generating keys" do
 
     before do
-      @store = Trike::EntityStore.new("/root/path")
+      @store = Trike::Cache::EntityStore.new("/root/path")
     end
     
     it "adds index.html when accessing the root of the site" do
