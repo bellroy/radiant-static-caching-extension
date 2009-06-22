@@ -23,7 +23,6 @@ describe Trike::Cache::EntityStore do
       @store.write("body", "text/plain", "http://www.example.com/path/to/file?query=string")
     end
 
-
     it "writes the content of the page to a file" do
       cache_file = StringIO.new
       File.stub!(:open).and_yield(cache_file)
