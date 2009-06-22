@@ -68,12 +68,14 @@ describe Trike::EntityStore do
     end
 
     it "should not add an extension when one is already present" do
-      @store.generate_key("text/html", "http://www.example.com/path/to/main.css").should == "/path/to/main.css"
+      @store.generate_key("text/css", "http://www.example.com/path/to/main.css?").should == "/path/to/main.css"
     end
 
     it "copies the extension if there is a query string" do
       @store.generate_key("text/html", "http://www.example.com/path/to/index.html?stuff").should == "/path/to/index.html?stuff.html"
     end
+
+    it "handles index.html"
 
   end
 

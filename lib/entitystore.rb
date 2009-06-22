@@ -39,7 +39,7 @@ module Trike
       path += '?' + uri.query unless uri.query.blank?
       if ext.blank?
         path += ".html" if (content_type.nil? || content_type.starts_with?("text/html"))
-      elsif uri.query
+      elsif not uri.query.blank?
         path += ext
       end
       path
