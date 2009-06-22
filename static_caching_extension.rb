@@ -1,5 +1,6 @@
-require "metastore"
-require "entitystore"
+require "trike/cache/metastore"
+require "trike/cache/entitystore"
+require 'trike/cache/key'
 
 class StaticCachingExtension < Radiant::Extension
   version "2.0"

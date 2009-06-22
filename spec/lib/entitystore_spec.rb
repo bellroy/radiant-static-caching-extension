@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../spec_helper'
-require 'entitystore'
+require 'trike/cache/entitystore'
 
 describe Trike::EntityStore do
 

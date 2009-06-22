@@ -1,5 +1,5 @@
 require File.dirname(__FILE__) + '/../spec_helper'
-require 'metastore'
+require 'trike/cache/metastore'
 
 describe Trike::MetaStore do
   
