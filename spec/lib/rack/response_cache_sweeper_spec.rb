@@ -30,13 +30,23 @@ describe Rack::ResponseCacheSweeper do
     end
   end
 
-  it "should return whatever the app returns" do
-    response = [status = 200, headers = {}, body = ""]
-    response_obj = Rack::MockResponse.new(status, headers, body)
-    @app.stub!(:call).and_return response
-    request.status.should == response_obj.status
-    request.headers.should == response_obj.headers
-    request.body.should == response_obj.body
+  describe 'app response' do
+    before do
+      @app.stub!(:call).and_return [@status = 200, @headers = {}, @body = ""]
+      @response = Rack::MockResponse.new(@status, @headers, @body)
+    end
+    
+    it "should not modify the status" do
+      request.status.should == @status
+    end
+    
+    it "should not modify the headers" do
+      request.headers.should == @headers
+    end
+    
+    it "should not modify the body" do
+      request.body.should == @body
+    end
   end
   
   it "shouldn't modify the environment" do
