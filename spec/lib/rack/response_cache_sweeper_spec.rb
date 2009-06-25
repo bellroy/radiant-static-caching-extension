@@ -1,7 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
-describe Rack::ResponseCacheSweeper do
-  
+describe Rack::ResponseCacheSweeper do  
   before do
     @cache = '/path/to/blah'
     @app = lambda { |env| [200, {}, []]} 
@@ -30,7 +29,7 @@ describe Rack::ResponseCacheSweeper do
       end
     end
   end
-  
+
   it "should return whatever the app returns" do
     response = [status = 200, headers = {}, body = ""]
     response_obj = Rack::MockResponse.new(status, headers, body)

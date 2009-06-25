@@ -3,21 +3,16 @@
 
 class ResponseCacheSweeperExtension < Radiant::Extension
   version "1.0"
-  description "Describe your extension here"
-  url "http://yourwebsite.com/response_cache_sweeper"
-  
-  # define_routes do |map|
-  #   map.namespace :admin, :member => { :remove => :get } do |admin|
-  #     admin.resources :response_cache_sweeper
-  #   end
-  # end
+  description "Rack to removes static cached files in a given directory for POST, PUTS and DELETE"
+  url "http://github.com/tricycle/radiant-response-cache-sweeper-extension"
   
   def activate
-    # admin.tabs.add "Response Cache Sweeper", "/admin/response_cache_sweeper", :after => "Layouts", :visibility => [:all]
+    Rack
+    Rack::ResponseCacheSweeper
+    ActionController::Dispatcher.middleware.use Rack::ResponseCacheSweeper, "#{RAILS_ROOT}/public/radiant-cache"
   end
   
   def deactivate
-    # admin.tabs.remove "Response Cache Sweeper"
+    ActionController::Dispatcher.middleware.delete Rack::ResponseCacheSweeper
   end
-  
 end
