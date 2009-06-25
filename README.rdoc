@@ -1,0 +1,74 @@
+= Static Caching
+
+A Radiant Extension to do static file caching.
+
+Then Apache (et. al.) can be used to serve the pages without hitting the ruby app at all.
+
+= Installation
+
+- Place in the vendor/extensions/static_caching
+- Install "rack-contrib" gem
+
+= Radiant Setup
+
+If your static cache dir differs from "#{RAILS_ROOT}/public/radiant-cache", set
+the STATIC_CACHE_DIR ruby variable in "config/initializers/static_caching.rb"
+
+= Apache Setup
+
+== Cache Location
+
+The location needs to be accessible to Apache. The simplest solution is to put the entity cache in
+a location already accessible to Apache, such as:
+<code>/path/to/radiant/public/radiant-cache</code>
+
+Alternatively you can make the default location accessible you
+need to add a section like the following to your apache configuration:
+
+  <Directory "/path/to/radiant/cache/entity">
+    Order allow,deny
+    Allow from all
+  </Directory>
+
+== Rewrite Rules
+
+You need some apache config along the lines of this (note that <code>/radiant-cache</code> here matches <code>/public/radiant-cache</code> in "Cache Location" above - if these don't agree Radiant will write
+a cache, but Apache will not use it):
+
+  # This is only needed if not already present in you config/virtual host
+  RewriteEngine On
+  
+  # Rewrite / to cache/index.html if it exists
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache/index.html -f
+  RewriteRule ^(/)?$ /radiant-cache/index.html [P,QSA,L]
+  
+  # Rewrite /path/to/page to cache/path/to/page if it exists (for paths already containing an extension)
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI} -f
+  RewriteRule . /radiant-cache%{REQUEST_URI} [P,QSA,L]
+  
+  # Rewrite /path/to/page to cache/path/to/page.html if it exists
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI}.html -f
+  RewriteRule . /radiant-cache%{REQUEST_URI}.html [P,QSA,L]
+  
+  # Rewrite /path/to/page/ (trailing slash) to cache/path/to/page.html if it exists
+  RewriteCond %{REQUEST_URI} ^(.+)/$
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache$1.html -f
+  RewriteRule ^(.+)/$ /radiant-cache$1.html [P,QSA,L]
+  
+== If using Passenger
+
+If you're using passenger and don't want it to spawn a Rails process just to serve cached content you need to add 
+<code>RailsAutoDetect off</code> to the vhost defining your app and setup another vhost to be the passenger application server.
+You can do this by binding the passenger vhost to a loopback address and proxying the requests
+
+  # In the externally accessible vhost
+  RailsAutoDetect off
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
+  RewriteRule . http://127.0.10.10%{REQUEST_URI} [P,QSA]
+  
+And in the other vhost:
+
+  <VirtualHost 127.0.10.10:80>
+    DocumentRoot /path/to/app
+    # usual setup
+  </VirtualHost>
