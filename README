@@ -1,3 +1,15 @@
-= Response Cache Sweeper
+= Static Caching
 
-Description goes here
+Caches GET requests to disk, and purges on POST/PUT/DELETEs
+
+== Installation
+
+- Place in the vendor/extensions/static_caching
+- Install "rack-contrib" gem
+
+== Configuration
+
+If your static cache dir differs from "#{RAILS_ROOT}/public/radiant-cache", set
+the STATIC_CACHE_DIR ruby variable in "config/initializers/static_caching.rb"
+
+== TODO : Merge with static caching README
