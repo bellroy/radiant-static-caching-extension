@@ -82,3 +82,8 @@ And in the other vhost:
     DocumentRoot /path/to/app
     # usual setup
   </VirtualHost>
+
+= TODO
+
+- Add proper caching of GET|HEAD with query string
+- Cache "(application|text)/javascript"
