@@ -2,7 +2,7 @@
 # require_dependency 'application_controller'
 
 class StaticCachingExtension < Radiant::Extension
-  version "1.0"
+  version "0.8.0"
   description "Caches GET requests to disk, and purges on POST/PUT/DELETEs"
   url "http://github.com/tricycle/radiant-static-cache-extension"
   
