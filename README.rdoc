@@ -61,6 +61,8 @@ If you're using passenger and don't want it to spawn a Rails process just to ser
 <code>RailsAutoDetect off</code> to the vhost defining your app and setup another vhost to be the passenger application server.
 You can do this by binding the passenger vhost to a loopback address and proxying the requests
 
+*OSX Note*: OS X only treats 127.0.0.1 as loopback, to add a host run <code>sudo ifconfig lo0 alias 127.0.10.10 up</code>
+
   # In the externally accessible vhost
   RailsAutoDetect off
   RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
