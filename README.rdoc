@@ -39,18 +39,22 @@ a cache, but Apache will not use it):
   RewriteEngine On
   
   # Rewrite / to cache/index.html if it exists
+  RewriteCond %{QUERY_STRING} ^$
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache/index.html -f
   RewriteRule ^(/)?$ /radiant-cache/index.html [P,QSA,L]
   
   # Rewrite /path/to/page to cache/path/to/page if it exists (for paths already containing an extension)
+  RewriteCond %{QUERY_STRING} ^$
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI} -f
   RewriteRule . /radiant-cache%{REQUEST_URI} [P,QSA,L]
   
   # Rewrite /path/to/page to cache/path/to/page.html if it exists
+  RewriteCond %{QUERY_STRING} ^$
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI}.html -f
   RewriteRule . /radiant-cache%{REQUEST_URI}.html [P,QSA,L]
   
   # Rewrite /path/to/page/ (trailing slash) to cache/path/to/page.html if it exists
+  RewriteCond %{QUERY_STRING} ^$
   RewriteCond %{REQUEST_URI} ^(.+)/$
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache$1.html -f
   RewriteRule ^(.+)/$ /radiant-cache$1.html [P,QSA,L]
