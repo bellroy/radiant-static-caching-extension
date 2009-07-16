@@ -87,3 +87,4 @@ And in the other vhost:
 
 - Add proper caching of GET|HEAD with query string
 - Cache "(application|text)/javascript"
+- Make only cache on success error codes 2XX
