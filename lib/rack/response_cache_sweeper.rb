@@ -1,5 +1,4 @@
 class Rack::ResponseCacheSweeper
-  
   def initialize(app, cache_path)
     @app, @cache_path = app, cache_path
   end
