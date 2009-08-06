@@ -2,13 +2,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 require 'fileutils'
 
+#NOTE: This specs ensure that we don't cache 'private' and 'no-cache'
+#TODO: Remove these specs once/if rack-contrib pulls out changes
 describe Rack::ResponseCache do
   F = ::File
 
   def request(opts={}, &block)
     @response_headers = opts[:response_headers] || {}
     Rack::MockRequest.new(
-      Rack::ResponseCache.new(@app, @cache, &StaticCachingExtension::CACHE_CONTROL_PATH_PROC)
+      Rack::ResponseCache.new(@app, @cache)
     ).send(:get, opts[:path]||@path, opts[:headers]||{})
   end
 
