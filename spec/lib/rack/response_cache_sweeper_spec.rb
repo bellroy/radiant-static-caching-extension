@@ -4,6 +4,8 @@ describe Rack::ResponseCacheSweeper do
   before do
     @cache = '/path/to/blah'
     @app = lambda { |env| [200, {}, []]} 
+    FileUtils.stub! :touch
+    FileUtils.stub! :rm_rf
   end
   
   def request
@@ -16,16 +18,34 @@ describe Rack::ResponseCacheSweeper do
     end
   
     %w(GET HEAD).each do |meth|
-      it "shouldn't do anything for #{meth} requests" do
-        @meth = meth
-        FileUtils.should_not_receive(:rm_rf)
+      describe "for #{meth} requests" do
+        before do
+          @meth = meth
+        end
+
+        it "shouldn't blow away the cache" do
+          FileUtils.should_not_receive(:rm_rf)
+        end
+
+        it "shouldn't touch last_edit" do
+          FileUtils.should_not_receive :touch
+        end
       end
     end
   
     %w(POST DELETE PUT).each do |meth|
-      it "should remove the cache directory for #{meth}" do
-        @meth = meth
-        FileUtils.should_receive(:rm_rf).with(@cache)
+      describe "for #{meth} requests" do
+        before do
+          @meth = meth
+        end
+
+        it "should remove the cache directory" do
+          FileUtils.should_receive(:rm_rf).with(File.join(@cache, '*'))
+        end
+
+        it "should touch last_edit when" do
+          FileUtils.should_receive(:touch).with(File.join(@cache, '.last_edit'))
+        end
       end
     end
   end
@@ -50,7 +70,6 @@ describe Rack::ResponseCacheSweeper do
   end
   
   it "shouldn't modify the environment" do
-    FileUtils.stub!(:rm_rf)
     @foo = mock("foo", :[] => nil)
     r = Rack::ResponseCacheSweeper.new(@app, @cache)
     @app.should_receive(:call).with @foo
