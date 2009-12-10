@@ -78,29 +78,7 @@ describe CacheWriter do
       CacheWriter.refresh!
     end
 
-    describe ".last_edit is older than .last_spider" do
-      before do
-        CacheWriter.stub!(:last_edit).and_return 2.days.ago
-        CacheWriter.stub!(:last_spider).and_return 1.hour.ago
-      end
-
-      it "should not prime the caches" do
-        CacheWriter.should_not_receive :prime!
-      end
-    end
-
-    describe ".last_edit is newer than .last_spider" do
-      before do
-        CacheWriter.stub!(:last_edit).and_return 1.hour.ago
-        CacheWriter.stub!(:last_spider).and_return 2.days.ago
-      end
-
-      it "should prime the caches" do
-        CacheWriter.should_receive :prime!
-      end
-    end
-
-    describe ".last_spider doesn't exist" do
+    describe "last_spider doesn't exist" do
       before do
         CacheWriter.stub!(:last_edit).and_return 1.hour.ago
         CacheWriter.stub!(:last_spider).and_return nil
@@ -108,6 +86,48 @@ describe CacheWriter do
 
       it "should prime the caches" do
         CacheWriter.should_receive :prime!
+      end
+    end
+
+    describe "last_spider does exist" do
+      before do
+        CacheWriter.stub!(:last_spider).and_return 1.hour.ago
+      end
+
+      describe "and last_edit doesn't exist" do
+        before do
+          CacheWriter.stub!(:last_edit).and_return nil
+        end
+
+        it "should not prime the caches" do
+          CacheWriter.should_not_receive :prime!
+        end
+      end
+
+      describe "and last_edit is more recent than last_spider" do
+        describe "and last_edit was less than 20 minutes ago" do
+          it "should not prime the caches" do
+            CacheWriter.stub!(:last_edit).and_return 10.minutes.ago
+            CacheWriter.should_not_receive :prime!
+          end
+        end
+
+        describe "and last_edit was over 20 minutes ago" do
+          it "should prime the caches" do
+            CacheWriter.stub!(:last_edit).and_return 30.minutes.ago
+            CacheWriter.should_receive :prime!
+          end
+        end
+      end
+
+      describe "and last_edit is older than last_spider" do
+        before do
+          CacheWriter.stub!(:last_edit).and_return 2.days.ago
+        end
+
+        it "should not prime the caches" do
+          CacheWriter.should_not_receive :prime!
+        end
       end
     end
   end

@@ -22,29 +22,31 @@ class CacheWriter
 
   def run
     sitemap_exists? ? spider_sitemap : spider_homepage
-    FileUtils.touch last_spider_path
+    FileUtils.touch self.class.last_spider_path
   end
 
-  def self.prime!
-    new.run
-  end
+  class << self
+    def prime!
+      new.run
+    end
 
-  def self.refresh!
-    prime! if last_spider.nil? || last_edit && last_edit > last_spider
+    def refresh!
+      prime! if last_spider.nil? || last_edit && last_edit > last_spider && last_edit < 20.minutes.ago
+    end
+
+    %w(edit spider).each do |event|
+      define_method("last_#{event}_path") do
+        File.join(StaticCachingExtension::STATIC_CACHE_DIR, ".last_#{event}")
+      end
+
+      define_method("last_#{event}") do
+        path = send("last_#{event}_path")
+        File.mtime path if File.exists? path
+      end
+    end
   end
 
 protected
-
-  %w(edit spider).each do |event|
-    define_method("last_#{event}_path") do
-      File.join(StaticCachingExtension::STATIC_CACHE_DIR, ".last_#{event}")
-    end
-
-    define_method("last_#{event}") do
-      path = send("last_#{event}_path")
-      File.mtime path if File.exists? path
-    end
-  end
 
   def spider_sitemap
     puts "Spidering sitemap:"
