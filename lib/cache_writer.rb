@@ -10,20 +10,41 @@ class CacheWriter
     # Turn off existing caching so the request isn't intercepted.
     ActionController::Dispatcher.middleware.delete Radiant::Cache
     # ActionController::Base.perform_caching = false
-    
+
     # Construct the app for charging our cache.
     @app = Rack::Builder.new {
       map "/" do
+        # use Rails::Rack::Static # Kept commented because we might hit the file cache when making requests.
         run ActionController::Dispatcher.new
       end
     }.to_app
   end
-  
+
   def run
     sitemap_exists? ? spider_sitemap : spider_homepage
+    FileUtils.touch last_spider_path
+  end
+
+  def self.prime!
+    new.run
+  end
+
+  def self.refresh!
+    prime! if last_spider.nil? || last_edit && last_edit > last_spider
   end
 
 protected
+
+  %w(edit spider).each do |event|
+    define_method("last_#{event}_path") do
+      File.join(StaticCachingExtension::STATIC_CACHE_DIR, ".last_#{event}")
+    end
+
+    define_method("last_#{event}") do
+      path = send("last_#{event}_path")
+      File.mtime path if File.exists? path
+    end
+  end
 
   def spider_sitemap
     puts "Spidering sitemap:"
