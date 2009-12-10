@@ -7,14 +7,14 @@ describe CacheWriter do
       FileUtils.stub! :touch
     end
 
-    after do
-      @cache_writer.run
-    end
-
     describe "with a sitemap" do
       before do
         @cache_writer.stub!(:sitemap_exists?).and_return true
         @cache_writer.stub! :spider_sitemap
+      end
+
+      after do
+        @cache_writer.run
       end
 
       it "should not try and spider the homepage" do
@@ -32,6 +32,10 @@ describe CacheWriter do
         @cache_writer.stub! :spider_homepage
       end
 
+      after do
+        @cache_writer.run
+      end
+
       it "should not try and spider the sitemap" do
         @cache_writer.should_not_receive :spider_sitemap
       end
@@ -41,10 +45,14 @@ describe CacheWriter do
       end
     end
 
-    it "should touch .last_spider on successful completion" do
+    it "should touch .last_spider_attempt regardless of completion" do
       @cache_writer.stub!(:sitemap_exists?).and_return true
-      @cache_writer.stub! :spider_sitemap
-      FileUtils.should_receive(:touch).with(File.join(StaticCachingExtension::STATIC_CACHE_DIR, '.last_spider'))
+      @cache_writer.stub!(:spider_sitemap).and_raise
+      FileUtils.should_receive(:touch).with(File.join(StaticCachingExtension::STATIC_CACHE_DIR, '.last_spider_attempt'))
+
+      lambda {
+        @cache_writer.run
+      }.should raise_error
     end
   end
 
@@ -78,10 +86,10 @@ describe CacheWriter do
       CacheWriter.refresh!
     end
 
-    describe "last_spider doesn't exist" do
+    describe "last_spider_attempt doesn't exist" do
       before do
         CacheWriter.stub!(:last_edit).and_return 1.hour.ago
-        CacheWriter.stub!(:last_spider).and_return nil
+        CacheWriter.stub!(:last_spider_attempt).and_return nil
       end
 
       it "should prime the caches" do
@@ -89,9 +97,9 @@ describe CacheWriter do
       end
     end
 
-    describe "last_spider does exist" do
+    describe "last_spider_attempt does exist" do
       before do
-        CacheWriter.stub!(:last_spider).and_return 1.hour.ago
+        CacheWriter.stub!(:last_spider_attempt).and_return 1.hour.ago
       end
 
       describe "and last_edit doesn't exist" do
@@ -104,7 +112,7 @@ describe CacheWriter do
         end
       end
 
-      describe "and last_edit is more recent than last_spider" do
+      describe "and last_edit is more recent than last_spider_attempt" do
         describe "and last_edit was less than 20 minutes ago" do
           it "should not prime the caches" do
             CacheWriter.stub!(:last_edit).and_return 10.minutes.ago
@@ -120,7 +128,7 @@ describe CacheWriter do
         end
       end
 
-      describe "and last_edit is older than last_spider" do
+      describe "and last_edit is older than last_spider_attempt" do
         before do
           CacheWriter.stub!(:last_edit).and_return 2.days.ago
         end

@@ -21,8 +21,8 @@ class CacheWriter
   end
 
   def run
+    FileUtils.touch self.class.last_spider_attempt_path
     sitemap_exists? ? spider_sitemap : spider_homepage
-    FileUtils.touch self.class.last_spider_path
   end
 
   class << self
@@ -31,10 +31,10 @@ class CacheWriter
     end
 
     def refresh!
-      prime! if last_spider.nil? || last_edit && last_edit > last_spider && last_edit < 20.minutes.ago
+      prime! if last_spider_attempt.nil? || last_edit && last_edit > last_spider_attempt && last_edit < 20.minutes.ago
     end
 
-    %w(edit spider).each do |event|
+    %w(edit spider_attempt).each do |event|
       define_method("last_#{event}_path") do
         File.join(StaticCachingExtension::STATIC_CACHE_DIR, ".last_#{event}")
       end
