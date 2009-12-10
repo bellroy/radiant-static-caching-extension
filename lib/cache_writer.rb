@@ -27,7 +27,7 @@ protected
 
   def spider_sitemap
     puts "Spidering sitemap:"
-    return false
+    @sitemap.css('urlset url loc').each { |url| ping_path URI.parse(url).path }
   end
 
   def spider_homepage
@@ -37,20 +37,22 @@ protected
     if last_response.ok?
       puts "done."
       index = Nokogiri::HTML last_response.body
-      index.css('a[href^="/articles"]').each do |link|
-        print "\tFetching #{link[:href]}..."
-        get link[:href]
-        if last_response.ok?
-          puts "done."
-        else
-          puts "error."
-          return false
-        end
-      end
+      index.css('a[href^="/articles"]').each { |link| ping_path link[:href] }
       return true
     else
       puts "error."
-      return false
+      raise "Couldn't fetch index."
+    end
+  end
+
+  def ping_path(path)
+    print "\tFetching #{path}..."
+    get path
+    if last_response.ok?
+      puts "done."
+    else
+      puts "error."
+      raise "Couldn't fetch #{path}."
     end
   end
 
