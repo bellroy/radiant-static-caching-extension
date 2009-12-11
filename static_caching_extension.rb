@@ -14,10 +14,12 @@ class StaticCachingExtension < Radiant::Extension
 
     ActionController::Dispatcher.middleware.use Rack::ResponseCache, STATIC_CACHE_DIR
     ActionController::Dispatcher.middleware.use Rack::ResponseCacheSweeper, STATIC_CACHE_DIR
+    @radiant_cache = ActionController::Dispatcher.middleware.delete Radiant::Cache
   end
 
   def deactivate
     ActionController::Dispatcher.middleware.delete Rack::ResponseCache
     ActionController::Dispatcher.middleware.delete Rack::ResponseCacheSweeper
+    ActionController::Dispatcher.middleware.use @radiant_cache if @radiant_cache
   end
 end

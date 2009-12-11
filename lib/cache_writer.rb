@@ -8,7 +8,7 @@ class CacheWriter
 
   def initialize
     # Turn off existing caching so the request isn't intercepted.
-    ActionController::Dispatcher.middleware.delete Radiant::Cache
+    # ActionController::Dispatcher.middleware.delete Radiant::Cache
     # ActionController::Base.perform_caching = false
 
     # Construct the app for charging our cache.
