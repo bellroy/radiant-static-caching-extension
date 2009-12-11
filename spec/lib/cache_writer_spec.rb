@@ -77,14 +77,8 @@ describe CacheWriter do
     end
   end
 
-  describe "refreshing when" do
-    before do
-      CacheWriter.stub :prime!
-    end
-
-    after do
-      CacheWriter.refresh!
-    end
+  describe "fresh when" do
+    subject { CacheWriter }
 
     describe "last_spider_attempt doesn't exist" do
       before do
@@ -92,9 +86,7 @@ describe CacheWriter do
         CacheWriter.stub!(:last_spider_attempt).and_return nil
       end
 
-      it "should prime the caches" do
-        CacheWriter.should_receive :prime!
-      end
+      it { should_not be_fresh }
     end
 
     describe "last_spider_attempt does exist" do
@@ -107,24 +99,24 @@ describe CacheWriter do
           CacheWriter.stub!(:last_edit).and_return nil
         end
 
-        it "should not prime the caches" do
-          CacheWriter.should_not_receive :prime!
-        end
+        it { should be_fresh }
       end
 
       describe "and last_edit is more recent than last_spider_attempt" do
         describe "and last_edit was less than 20 minutes ago" do
-          it "should not prime the caches" do
+          before do
             CacheWriter.stub!(:last_edit).and_return 10.minutes.ago
-            CacheWriter.should_not_receive :prime!
           end
+
+          it { should be_fresh }
         end
 
         describe "and last_edit was over 20 minutes ago" do
-          it "should prime the caches" do
+          before do
             CacheWriter.stub!(:last_edit).and_return 30.minutes.ago
-            CacheWriter.should_receive :prime!
           end
+
+          it { should_not be_fresh }
         end
       end
 
@@ -133,9 +125,7 @@ describe CacheWriter do
           CacheWriter.stub!(:last_edit).and_return 2.days.ago
         end
 
-        it "should not prime the caches" do
-          CacheWriter.should_not_receive :prime!
-        end
+        it { should be_fresh }
       end
     end
   end

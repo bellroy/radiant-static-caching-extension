@@ -31,9 +31,10 @@ class CacheWriter
       new.run
     end
 
-    def refresh!
-      prime! if last_spider_attempt.nil? || last_edit && last_edit > last_spider_attempt && last_edit < 20.minutes.ago
+    def stale?
+      last_spider_attempt.nil? || last_edit && last_edit > last_spider_attempt && last_edit < 20.minutes.ago
     end
+    def fresh?; !stale? end
 
     %w(edit spider_attempt).each do |event|
       define_method("last_#{event}_path") do
