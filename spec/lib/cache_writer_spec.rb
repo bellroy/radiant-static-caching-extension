@@ -48,7 +48,7 @@ describe CacheWriter do
     it "should touch .last_spider_attempt regardless of completion" do
       @cache_writer.stub!(:sitemap_exists?).and_return true
       @cache_writer.stub!(:spider_sitemap).and_raise
-      FileUtils.should_receive(:touch).with(File.join(StaticCachingExtension::STATIC_CACHE_DIR, '.last_spider_attempt'))
+      FileUtils.should_receive(:touch).with(File.join(ResponseCacheConfig.cache_dir, '.last_spider_attempt'))
 
       lambda {
         @cache_writer.run

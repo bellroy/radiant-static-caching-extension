@@ -6,20 +6,18 @@ class StaticCachingExtension < Radiant::Extension
   description "Caches GET requests to disk, and purges on POST/PUT/DELETEs"
   url "http://github.com/tricycle/radiant-static-cache-extension"
 
-  STATIC_CACHE_DIR = "#{RAILS_ROOT}/public/radiant-cache" unless defined?(STATIC_CACHE_DIR)
-
   def activate
     gem "tricycle-rack-contrib"
     require "rack/contrib/response_cache"
 
-    ActionController::Dispatcher.middleware.use Rack::ResponseCache, STATIC_CACHE_DIR
-    ActionController::Dispatcher.middleware.use Rack::ResponseCacheSweeper, STATIC_CACHE_DIR
     @radiant_cache = ActionController::Dispatcher.middleware.delete Radiant::Cache
+    ActionController::Dispatcher.middleware.use Rack::ResponseCache, ResponseCacheConfig.cache_dir
+    ActionController::Dispatcher.middleware.use Rack::ResponseCacheSweeper, ResponseCacheConfig.cache_dir
   end
 
   def deactivate
-    ActionController::Dispatcher.middleware.delete Rack::ResponseCache
     ActionController::Dispatcher.middleware.delete Rack::ResponseCacheSweeper
+    ActionController::Dispatcher.middleware.delete Rack::ResponseCache
     ActionController::Dispatcher.middleware.use @radiant_cache if @radiant_cache
   end
 end

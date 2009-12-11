@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'rack/test'
+require File.expand_path(File.dirname(__FILE__) + '/response_cache_config')
 
 class CacheWriter
   include Rack::Test::Methods
@@ -36,7 +37,7 @@ class CacheWriter
 
     %w(edit spider_attempt).each do |event|
       define_method("last_#{event}_path") do
-        File.join(StaticCachingExtension::STATIC_CACHE_DIR, ".last_#{event}")
+        File.join(ResponseCacheConfig.cache_dir, ".last_#{event}")
       end
 
       define_method("last_#{event}") do
