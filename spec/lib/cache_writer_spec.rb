@@ -77,55 +77,68 @@ describe CacheWriter do
     end
   end
 
-  describe "fresh when" do
+  describe "freshness: when" do
     subject { CacheWriter }
 
-    describe "last_spider_attempt doesn't exist" do
-      before do
-        CacheWriter.stub!(:last_edit).and_return 1.hour.ago
-        CacheWriter.stub!(:last_spider_attempt).and_return nil
-      end
-
-      it { should_not be_fresh }
-    end
-
-    describe "last_spider_attempt does exist" do
-      before do
-        CacheWriter.stub!(:last_spider_attempt).and_return 1.hour.ago
-      end
-
-      describe "and last_edit doesn't exist" do
+    describe "last_edit exists" do
+      describe "and is older than 20 minutes" do
         before do
-          CacheWriter.stub!(:last_edit).and_return nil
+          CacheWriter.stub!(:last_edit).and_return 1.hour.ago
         end
 
-        it { should be_fresh }
-      end
-
-      describe "and last_edit is more recent than last_spider_attempt" do
-        describe "and last_edit was less than 20 minutes ago" do
+        describe "and last_spider_attempt is older than last_edit" do
           before do
-            CacheWriter.stub!(:last_edit).and_return 10.minutes.ago
+            CacheWriter.stub!(:last_spider_attempt).and_return 2.hours.ago
+          end
+
+          it { should_not be_fresh }
+        end
+
+        describe "and last_spider_attempt is younger than last_edit" do
+          before do
+            CacheWriter.stub!(:last_spider_attempt).and_return 10.minutes.ago
           end
 
           it { should be_fresh }
         end
 
-        describe "and last_edit was over 20 minutes ago" do
+        describe "and last_spider_attempt doesn't exist" do
           before do
-            CacheWriter.stub!(:last_edit).and_return 30.minutes.ago
+            CacheWriter.stub!(:last_spider_attempt).and_return nil
           end
 
           it { should_not be_fresh }
         end
       end
 
-      describe "and last_edit is older than last_spider_attempt" do
+      describe "and is less than 20 minutes old" do
         before do
-          CacheWriter.stub!(:last_edit).and_return 2.days.ago
+          CacheWriter.stub!(:last_edit).and_return 10.minutes.ago
         end
 
         it { should be_fresh }
+      end
+    end
+
+    describe "last_edit doesn't exist" do
+      before do
+        CacheWriter.stub!(:last_edit).and_return nil
+      end
+
+      describe "and last_spider_attempt does exist" do
+        before do
+          CacheWriter.stub!(:last_spider_attempt).and_return 1.hour.ago
+        end
+
+        it { should be_fresh }
+      end
+
+      describe "and last_spider_attempt doesn't exist" do
+        before do
+          CacheWriter.stub!(:last_spider_attempt).and_return nil
+        end
+
+        it { should_not be_fresh }
       end
     end
   end
