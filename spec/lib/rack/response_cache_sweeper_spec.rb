@@ -6,6 +6,7 @@ describe Rack::ResponseCacheSweeper do
     @app = lambda { |env| [200, {}, []]}
     FileUtils.stub! :touch
     FileUtils.stub! :rm_rf
+    FileUtils.stub! :rm
   end
 
   def request
@@ -24,7 +25,7 @@ describe Rack::ResponseCacheSweeper do
         end
 
         it "shouldn't blow away the cache" do
-          FileUtils.should_not_receive(:rm_rf)
+          FileUtils.should_not_receive :rm_rf
         end
 
         it "shouldn't touch last_edit" do
@@ -41,16 +42,17 @@ describe Rack::ResponseCacheSweeper do
         end
 
         it "should remove the contents of the cache directory" do
-          FileUtils.should_receive(:rm_rf).with(Dir.glob(File.join(@cache, '*')))
+          FileUtils.should_receive(:rm_rf).with Dir.glob(File.join(@cache, '*'))
         end
 
         it "should remove last_edit and last_spider_attempt from the cache directory" do
-          FileUtils.should_receive(:rm_rf).with(%(edit spider_attempt).map { |part| File.join(@cache, ".last_#{part}") })
-
+          %(edit spider_attempt).each do |part|
+            FileUtils.should_receive(:rm).with File.join(@cache, ".last_#{ part }")
+          end
         end
 
         it "should touch last_edit" do
-          FileUtils.should_receive(:touch).with(File.join(@cache, '.last_edit'))
+          FileUtils.should_receive(:touch).with File.join(@cache, '.last_edit')
         end
       end
     end
