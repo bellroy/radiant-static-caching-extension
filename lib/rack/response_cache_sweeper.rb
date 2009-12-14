@@ -6,7 +6,7 @@ class Rack::ResponseCacheSweeper
   def call(env)
     unless ['GET', 'HEAD'].include? env['REQUEST_METHOD']
       FileUtils.rm_rf Dir.glob(File.join(@cache_path, '*'))
-      %(edit spider_attempt).each { |part| FileUtils.rm File.join(@cache_path, ".last_#{part}") }
+      %w(edit spider_attempt).each { |part| FileUtils.rm_rf File.join(@cache_path, ".last_#{part}") }
       FileUtils.touch File.join(@cache_path, '.last_edit')
     end
     @app.call(env)
