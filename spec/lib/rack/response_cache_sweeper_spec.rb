@@ -37,7 +37,10 @@ describe Rack::ResponseCacheSweeper do
       describe "for #{meth} requests" do
         before do
           @meth = meth
-
+        end
+        
+        it "should ensure the cache path exists" do
+          CacheWriter.should_receive :ensure_cache_dir
         end
 
         it "should remove the contents of the cache directory" do
