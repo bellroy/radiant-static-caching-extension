@@ -22,11 +22,20 @@ class CacheWriter
   end
 
   def run
+    self.class.ensure_cache_dir
     FileUtils.touch self.class.last_spider_attempt_path
     sitemap_exists? ? spider_sitemap : spider_homepage
   end
 
   class << self
+    def cache_dir_exists?
+      File.exists?(ResponseCacheConfig.cache_dir) && File.stat(ResponseCacheConfig.cache_dir).directory?
+    end
+
+    def ensure_cache_dir
+      FileUtils.mkdir_p ResponseCacheConfig.cache_dir unless cache_dir_exists?
+    end
+
     def prime!
       new.run
     end
