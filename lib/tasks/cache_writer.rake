@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../cache_writer')
 
 namespace :cache do
-  desc "Primes primary caches."
+  desc "Primes primary caches. Specify MAX_SPIDERS to skip if the number of spiders exceeds that specified."
   task :prime => :environment do
     max = ENV['MAX_SPIDERS'].present? && ENV['MAX_SPIDERS'].to_i
     max ? CacheWriter.prime_with_locking!(max) : CacheWriter.prime!
