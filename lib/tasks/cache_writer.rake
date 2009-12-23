@@ -3,11 +3,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../cache_writer')
 namespace :cache do
   desc "Primes primary caches."
   task :prime => :environment do
-    max_load = ENV['MAX_LOAD'] && ENV['MAX_LOAD'].to_f
-    load_avg = File.read("/proc/loadavg") rescue nil
-    
-    # If we can't ascertain load, run it. If we can, run unless we're loaded.
-    CacheWriter.prime! unless max_load && load_avg && load_avg.split.first.to_f > max_load
+    max = ENV['MAX_SPIDERS'].present? && ENV['MAX_SPIDERS'].to_i
+    max ? CacheWriter.prime_with_locking!(max) : CacheWriter.prime!
   end
 
   desc "Primes primary caches if stale."

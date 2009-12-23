@@ -84,6 +84,29 @@ describe CacheWriter do
       @cache_writer.should_receive :run
       CacheWriter.prime!
     end
+
+    describe "with lock" do
+      after do
+        CacheWriter.prime_with_locking! 20
+      end
+
+      it "should check for lock files" do
+        Dir.should_receive(:glob).with(File.join(Dir::tmpdir, 'radiant_sites_static_cache_lock.*')).and_return []
+      end
+
+      it "should not prime if there are more than max_spiders lock files" do
+        Dir.stub!(:glob).and_return Array.new(40)
+        CacheWriter.should_not_receive :prime!
+      end
+
+      it "should create a temporary lock file" do
+        Tempfile.should_receive(:open).with 'radiant_sites_static_cache_lock'
+      end
+
+      it "should prime the cache normally" do
+        CacheWriter.should_receive :prime!
+      end
+    end
   end
 
   describe "freshness: when" do
