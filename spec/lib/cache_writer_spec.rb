@@ -115,6 +115,13 @@ describe CacheWriter do
         files.each(&:close)
       end
     end
+
+    describe "without locking" do
+      it "should create a temporary lock file so it can be counted" do
+        Tempfile.should_receive(:open).with 'radiant_sites_static_cache_lock'
+        CacheWriter.prime!
+      end
+    end
   end
 
   describe "freshness: when" do
