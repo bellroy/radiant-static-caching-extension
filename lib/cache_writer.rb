@@ -42,8 +42,8 @@ class CacheWriter
 
     def prime_with_locking!(max_spiders)
       Tempfile.open('radiant_sites_static_cache_lock') do
-        spiders = Dir.glob(File.join(Dir::tmpdir, 'radiant_sites_static_cache_lock.*'))
-        prime! unless spiders.length >= max_spiders
+        spiders = Dir.glob(File.join(Dir::tmpdir, 'radiant_sites_static_cache_lock*'))
+        prime! unless spiders.length > max_spiders
       end
     end
 
