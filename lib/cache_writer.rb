@@ -1,9 +1,7 @@
 require 'nokogiri'
-require 'rack/test'
 require File.expand_path(File.dirname(__FILE__) + '/response_cache_config')
 
 class CacheWriter
-  include Rack::Test::Methods
 
   attr_reader :app
 
