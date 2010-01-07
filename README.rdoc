@@ -38,12 +38,6 @@ a cache, but Apache will not use it):
   # This is only needed if not already present in you config/virtual host
   RewriteEngine On
   
-  # Rewrite / to cache/index.html if it exists
-  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
-  RewriteCond %{QUERY_STRING} ^$
-  RewriteCond %{DOCUMENT_ROOT}/radiant-cache/index.html -f
-  RewriteRule ^/?$ /radiant-cache/index.html [proxy,last]
-  
   # Rewrite /path/to/page to cache/path/to/page if it exists (for paths already containing an extension
   # or no extension)
   RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
@@ -51,22 +45,22 @@ a cache, but Apache will not use it):
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI} -f
   RewriteRule . /radiant-cache%{REQUEST_URI} [P,L]
 
-  # Rewrite /path/to/page/ (trailing slash) to cache/path/to/page if it exists (for paths already
-  # containing an extension or no extension)
-  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
-  RewriteCond %{QUERY_STRING} ^$
-  RewriteCond %{REQUEST_URI} ^(.+)/$
-  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%1 -f
-    # %1 is match from last RewriteCond
-  RewriteRule ^(.+)/$ /radiant-cache$1 [P,L]
-  
   # Rewrite /path/to/page/? (with or without trailing slash) to
   # cache/path/to/page.{whitelisted extension} if it exists
   RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
   RewriteCond %{QUERY_STRING} ^$
   RewriteCond %{REQUEST_URI} ^(.+)/?$
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache%1.(html|css|txt|js|csv|xml|pdf|xhtml) -f
+    # %1 is match from last RewriteCond
   RewriteRule ^(.+)/?$ /radiant-cache$1.%1 [P,L]
+
+  # Rewrite /path/to/page/? (with or without trailing slash) (or /) to
+  # cache/path/to/page/index.html if it exists
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{QUERY_STRING} ^$
+  RewriteCond %{REQUEST_URI} ^(.*)/?$
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%1/index.html -f
+  RewriteRule ^(.*)/?$ /radiant-cache$1/index.html [proxy,last]
   
 == If using Passenger
 
