@@ -73,9 +73,14 @@ describe Rack::ResponseCache do
       @cache.should == {'/a.html'=>@value, '/b.xml'=>@value, '/c.css'=>@value}
     end
 
-    it "should not delete existing extensions" do
+    it "should not delete existing unknown extensions" do
+      request(:path=>'/d.seo', :response_headers=>{'Content-Type'=>'text/html'})
+      @cache.should == {'/d.seo.html'=>@value}
+    end
+
+    it "should not cache when known extensions disagree with content type" do
       request(:path=>'/d.css', :response_headers=>{'Content-Type'=>'text/html'})
-      @cache.should == {'/d.css.html'=>@value}
+      @cache.should == {}
     end
 
     it "should cache html responses with empty basename to index.html by default" do

@@ -7,7 +7,7 @@ Then Apache (et. al.) can be used to serve the pages without hitting the ruby ap
 = Installation
 
 - Place in the vendor/extensions/static_caching
-- Install "rack-contrib" gem
+- Install "tricycle-rack-contrib" gem (hosted at gemcutter.org)
 
 = Radiant Setup
 
@@ -42,26 +42,30 @@ a cache, but Apache will not use it):
   RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
   RewriteCond %{QUERY_STRING} ^$
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache/index.html -f
-  RewriteRule ^(/)?$ /radiant-cache/index.html [P,QSA,L]
+  RewriteRule ^/?$ /radiant-cache/index.html [proxy,last]
   
-  # Rewrite /path/to/page to cache/path/to/page if it exists (for paths already containing an extension)
+  # Rewrite /path/to/page to cache/path/to/page if it exists (for paths already containing an extension
+  # or no extension)
   RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
   RewriteCond %{QUERY_STRING} ^$
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI} -f
-  RewriteRule . /radiant-cache%{REQUEST_URI} [P,QSA,L]
-  
-  # Rewrite /path/to/page to cache/path/to/page.html if it exists
-  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
-  RewriteCond %{QUERY_STRING} ^$
-  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%{REQUEST_URI}.html -f
-  RewriteRule . /radiant-cache%{REQUEST_URI}.html [P,QSA,L]
-  
-  # Rewrite /path/to/page/ (trailing slash) to cache/path/to/page.html if it exists
+  RewriteRule . /radiant-cache%{REQUEST_URI} [P,L]
+
+  # Rewrite /path/to/page/ (trailing slash) to cache/path/to/page if it exists (for paths already
+  # containing an extension or no extension)
   RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
   RewriteCond %{QUERY_STRING} ^$
   RewriteCond %{REQUEST_URI} ^(.+)/$
-  RewriteCond %{DOCUMENT_ROOT}/radiant-cache$1.html -f
-  RewriteRule ^(.+)/$ /radiant-cache$1.html [P,QSA,L]
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%1 -f  # %1 is match from last RewriteCond
+  RewriteRule ^(.+)/$ /radiant-cache$1 [P,L]
+  
+  # Rewrite /path/to/page/? (with or without trailing slash) to
+  # cache/path/to/page.{whitelisted extension} if it exists
+  RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+  RewriteCond %{QUERY_STRING} ^$
+  RewriteCond %{REQUEST_URI} ^(.+)/?$
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%1.(html|css|txt|js|csv|xml|pdf|xhtml) -f
+  RewriteRule ^(.+)/?$ /radiant-cache$1.%1 [P,L]  # %1 is match from last RewriteCond
   
 == If using Passenger
 

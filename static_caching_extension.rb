@@ -7,7 +7,7 @@ class StaticCachingExtension < Radiant::Extension
   url "http://github.com/tricycle/radiant-static-cache-extension"
 
   def activate
-    gem "tricycle-rack-contrib"
+    gem "tricycle-rack-contrib", '>= 0.9.6'
     require "rack/contrib/response_cache"
 
     @radiant_cache = ActionController::Dispatcher.middleware.delete Radiant::Cache
