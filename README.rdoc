@@ -56,7 +56,8 @@ a cache, but Apache will not use it):
   RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
   RewriteCond %{QUERY_STRING} ^$
   RewriteCond %{REQUEST_URI} ^(.+)/$
-  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%1 -f  # %1 is match from last RewriteCond
+  RewriteCond %{DOCUMENT_ROOT}/radiant-cache%1 -f
+    # %1 is match from last RewriteCond
   RewriteRule ^(.+)/$ /radiant-cache$1 [P,L]
   
   # Rewrite /path/to/page/? (with or without trailing slash) to
@@ -65,7 +66,7 @@ a cache, but Apache will not use it):
   RewriteCond %{QUERY_STRING} ^$
   RewriteCond %{REQUEST_URI} ^(.+)/?$
   RewriteCond %{DOCUMENT_ROOT}/radiant-cache%1.(html|css|txt|js|csv|xml|pdf|xhtml) -f
-  RewriteRule ^(.+)/?$ /radiant-cache$1.%1 [P,L]  # %1 is match from last RewriteCond
+  RewriteRule ^(.+)/?$ /radiant-cache$1.%1 [P,L]
   
 == If using Passenger
 
