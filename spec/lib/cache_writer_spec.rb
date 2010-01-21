@@ -104,6 +104,10 @@ describe CacheWriter do
     end
 
     describe "with locking" do
+      before do
+        FileUtils.rm Dir.glob(File.join(Dir::tmpdir, 'radiant_sites_static_cache_lock*'))
+      end
+
       it "should not prime if there are more than max_spiders lock files" do
         spider_count = 7
         files = Array.new(spider_count) { Tempfile.new('radiant_sites_static_cache_lock') }
