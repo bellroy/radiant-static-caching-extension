@@ -35,16 +35,8 @@ describe CacheWriter do
           @cache_writer.stub! :spider_homepage
         end
 
-        after do
-          @cache_writer.run
-        end
-
-        it "should not try and spider the sitemap" do
-          @cache_writer.should_not_receive :spider_sitemap
-        end
-
-        it "should spider the index for links" do
-          @cache_writer.should_receive :spider_homepage
+        it "should raise an error" do
+          lambda { @cache_writer.run }.should raise_error(/No \/sitemap\.xml found/)
         end
       end
     end

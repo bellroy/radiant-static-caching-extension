@@ -23,8 +23,9 @@ class CacheWriter
 
   def run
     self.class.ensure_cache_dir
+    raise "No /sitemap.xml found" unless sitemap_exists?
     FileUtils.touch self.class.last_spider_attempt_path
-    sitemap_exists? ? spider_sitemap : spider_homepage
+    spider_sitemap
   end
 
   class << self
